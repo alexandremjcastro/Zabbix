@@ -1,0 +1,29 @@
+#!/bin/bash
+
+# **************************************************************************
+#
+# Script de ligação via asterisk para alertas enviados pelo Zabbix
+#
+# Ligação realizada pelo canal SIP, caso utilize outro canal, necessário
+# alterar no Script abaixo no item CANAL.
+#
+# Autor: Fabricio Guimarães
+# Manutenção: Alexandre Castro
+#
+# **************************************************************************
+
+CANAL='Seu_tronco'           #Canal utilizado para fazer as ligações
+ORIGEM='zabbix <9000>'          #Ramal de Origem válido, necessário para alguns canais funcionarem
+CONTEXTO='from-internal-custom' #Cotexto da ligação no Diaplan do Asterisk
+EXTENSAO='9001'                 #Extensão utilizada para a ligação
+ARQUIVAR=yes                    #Arquivar histórico das ligações (yes or no)
+
+#Salva um arquivo de texto na pasta temporária do Servidor do Zabbix
+echo -en "Channel: $CANAL$1\nCallerID: $ORIGEM\nContext: $CONTEXTO\nExtension: $EXTENSAO\nSetvar: MESSAGE="$2"\nArchive: $ARQUIVAR" >> /tmp/ligacao_zabbix.call
+
+#Move o arquivo para o servidor de PABX
+sudo scp /tmp/ligacao_zabbix.call root@ip_pabx:/tmp
+
+#Apaga o arquivo temporário do Servidor do Zabbix
+rm -rf /tmp/ligacao_zabbix.call
+

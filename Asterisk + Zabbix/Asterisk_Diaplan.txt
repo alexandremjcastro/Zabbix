@@ -1,0 +1,9 @@
+[from-internal-custom]
+exten => 9001,1,Answer()
+exten => 9001,n,agi(googletts.agi,"${MESSAGE}",pt-br)
+exten => 9001,n,Wait(1)
+exten => 9001,n,agi(googletts.agi,"Para repetir a mensagem, digite 1. Ou aguarde até que a chamada seja encerrada",pt-br)
+exten => 9001,n,WaitExten(5)
+exten => 9001,n,Hangup()
+exten => 1,1,agi(googletts.agi,"${MESSAGE}",pt-br)
+exten => 1,n,Hangup()

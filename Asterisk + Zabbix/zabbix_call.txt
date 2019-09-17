@@ -1,0 +1,3 @@
+#!/bin/bash
+chown asterisk. /tmp/ligacao_zabbix.call 2> /dev/null
+mv /tmp/ligacao_zabbix.call /var/spool/asterisk/outgoing/ 2> /dev/null

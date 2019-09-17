@@ -1,0 +1,2 @@
+# Ligacoes emergencias Zabbix
+*/1 * * * * /bin/sh /home/programas/scripts/zabbix_call.sh
