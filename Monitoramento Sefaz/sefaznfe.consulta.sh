@@ -100,5 +100,5 @@ if [[ $ESTADO,$STATUS == @(AM|BA|CE|GO|MG|MS|MT|PE|PR|RS|SP|SVAN|SVRS|SVC-AN|SVC
                         elif [[ $ESTADO,$STATUS == @(SVC-AN|SVC-RS),RECEPCAO.EVENTO ]]; then
                           STATUS_RECEPCAO_EVENTO3=$($CAT $ARQUIVO_TEMPORARIO | egrep "<td>$ESTADO</td>" | $AWK '{print $10}' | $AWK -F 'src="' '{print $2}'| $AWK -F '"' '{print $1}') && consultar_servico
 else
-  echo "10" #SEM DADOS
+  echo "5" #SEM DADOS
 fi
