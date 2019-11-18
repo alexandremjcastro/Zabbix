@@ -20,24 +20,37 @@ function db_root() {
     db_root
   done
 }
+function db_zabbix() {
+  echo "Digite uma senha para o usuário zabbix do banco de dados:"
+  read -ers SENHA_dbZABBIX
+  echo "Digite sua senha novamente para confirma:"
+  read -ers SENHA_dbZABBIX1
+  if [[ $SENHA_dbZABBIX != $SENHA_dbZABBIX1 ]]; then
+    echo "Senhas não coincidem, tente novamente."
+    sleep 2
+  fi
+  while [[ $SENHA_dbZABBIX != $SENHA_dbZABBIX1 ]]; do
+    db_zabbix
+  done
+}
 db_root # Chama a função para digitar a senha de root do banco de dados
-
+db_zabbix # Chama a função para digitar a senha do usuário zabbix do banco de dados
 
 echo "Alterando senha de root do Banco de Dados"
-mysql -uroot -p$SENHA_dbTMP -e "set password for "root"@"localhost" = password('$SENHA_dbROOT')" --connect-expired-password
+mysql -uroot -p$SENHA_dbTMP -e "set password for "root"@"localhost" = password('$SENHA_dbROOT')" --connect-expired-password 1> /dev/null
 sleep 1
-mysql -uroot -p$SENHA_dbROOT -e "flush privileges" --connect-expired-password
+mysql -uroot -p$SENHA_dbROOT -e "flush privileges" --connect-expired-password 1> /dev/null
 sleep 1
 echo "Criando banco de dados zabbix"
-mysql -uroot -p$SENHA_dbROOT -e "create database zabbix character set utf8 collate utf8_bin;" --connect-expired-password
+mysql -uroot -p$SENHA_dbROOT -e "create database zabbix character set utf8 collate utf8_bin;" --connect-expired-password 1> /dev/null
 sleep 1
 echo "Criando usuário zabbix"
-mysql -uroot -p$SENHA_dbROOT -e "create user "zabbix"@"localhost" identified by 'SdRedeszz#2019';" --connect-expired-password
+mysql -uroot -p$SENHA_dbROOT -e "create user "zabbix"@"localhost" identified by 'SdRedeszz#2019';" --connect-expired-password 1> /dev/null
 sleep 1
 echo "Garantindo permissions de administrador para o usuário zabbix"
-mysql -uroot -p$SENHA_dbROOT -e "grant all on zabbix.* to "zabbix"@"localhost" identified by 'SdRedeszz#2019';" --connect-expired-password
+mysql -uroot -p$SENHA_dbROOT -e "grant all on zabbix.* to "zabbix"@"localhost" identified by 'SdRedeszz#2019';" --connect-expired-password 1> /dev/null
 sleep 1
-mysql -uroot -p$SENHA_dbROOT -e "alter user "zabbix"@"localhost" identified with mysql_native_password by 'SdRedeszz#2019';" --connect-expired-password
+mysql -uroot -p$SENHA_dbROOT -e "alter user "zabbix"@"localhost" identified with mysql_native_password by 'SdRedeszz#2019';" --connect-expired-password 1> /dev/null
 sleep 1
 
 # Instalando Zabbix Server
