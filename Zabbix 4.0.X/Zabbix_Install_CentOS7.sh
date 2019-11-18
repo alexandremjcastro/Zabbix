@@ -1,41 +1,84 @@
+#!/usr/bin/env bash
+#
+# sefaznfe.consulta.sh - Consulta o status do serviço de NFE da receita federal
+#
+# GitHub:       https://github.com/alexandremjcastro/
+# Autor:        Alexandre Castro
+# Manutenção: -
+#
+# ------------------------------------------------------------------------ #
+#  - Este programa irá consultar o status do serviço de NFE da receita federal
+#  Responsável por realizar a consulta dentro do arquivo statusNFE.txt,
+#  nas consultas será pesquisada as linhas do Autorizador e cada linha de serviço
+#  deste autorizador, nesse script ele verificará as alterações das “Bolinhas”
+#  em cada serviço, se for verde (Disponível) ele apresentará o resultado 1, 2
+#  para amarelo (Indisponível) e 0 para Vermelho(Offine).
+#
+#  - Script criado com base no script do @bernardolankheet.
+#
+#   Exemplos:
+#      $ ./sefaznfe.consulta.sh AM AUTORIZACAO
+#      Neste exemplo o script realiza a consulta do campo de "Autorização" do
+#      estado de AM. Retornando o valor 1, 2 ou 0.
+# ------------------------------------------------------------------------ #
+# Histórico:
+#
+#   v1.0 07/11/2019, Alexandre:
+#     - Script criado.
+#
+# ------------------------------------------------------------------------ #
+# Testado em:
+#   bash 4.2.46
+# ------------------------------- VARIÁVEIS ----------------------------------------- #
 SERVER_NAME=$(hostname)
 SERVER_IP=$(hostname -I)
-
-
-# Criando Banco de Dados
-echo "Verificando senha padrão do mysql"
-SENHA_dbTMP=$(grep "temporary password" /var/log/mysqld.log | sed 's/\s\+//g' | cut -d: -f4)
-sleep 1
-
+# ------------------------------- FUNÇÕES ----------------------------------------- #
 function db_root() {
   echo "Digite uma senha para o usuário root do banco de dados:"
-  read -ers SENHA_dbROOT
+    read -ers SENHA_dbROOT
   echo "Digite sua senha novamente para confirma:"
-  read -ers SENHA_dbROOT1
-  if [[ $SENHA_dbROOT != $SENHA_dbROOT1 ]]; then
-    echo "Senhas não coincidem, tente novamente."
-    sleep 2
-  fi
-  while [[ $SENHA_dbROOT != $SENHA_dbROOT1 ]]; do
-    db_root
-  done
+    read -ers SENHA_dbROOT1
+      if [[ $SENHA_dbROOT != $SENHA_dbROOT1 ]]; then
+        echo "Senhas não coincidem, tente novamente." && db_root
+      fi
 }
 function db_zabbix() {
   echo "Digite uma senha para o usuário zabbix do banco de dados:"
-  read -ers SENHA_dbZABBIX
+    read -ers SENHA_dbZABBIX
   echo "Digite sua senha novamente para confirma:"
-  read -ers SENHA_dbZABBIX1
-  if [[ $SENHA_dbZABBIX != $SENHA_dbZABBIX1 ]]; then
-    echo "Senhas não coincidem, tente novamente."
-    sleep 2
-  fi
-  while [[ $SENHA_dbZABBIX != $SENHA_dbZABBIX1 ]]; do
-    db_zabbix
-  done
+    read -ers SENHA_dbZABBIX1
+      if [[ $SENHA_dbZABBIX != $SENHA_dbZABBIX1 ]]; then
+        echo "Senhas não coincidem, tente novamente." && db_zabbix
+      fi
 }
-db_root # Chama a função para digitar a senha de root do banco de dados
-db_zabbix # Chama a função para digitar a senha do usuário zabbix do banco de dados
+# ------------------------------- EXECUÇÃO ----------------------------------------- #
+# Instalando o Mysql
+echo "Realizando download da última versão do MySql"
+wget https://repo.mysql.com/mysql57-community-release-el7-11.noarch.rpm
+sleep 1
+rpm -ivh mysql57-community-release-el7-11.noarch.rpm
+echo "Instalando o MySql"
+yum install mysql-server -y
+echo "Iniciando serviço do Mysql"
+systemctl enable mysqld > /dev/null
+systemctl start mysqld
+db_mysql=$(systemctl status mysqld|grep running|wc -l)
+if [[ $db_mysql == 1 ]]; then
+  echo "Serviço mysqld iniciado com sucesso!"
+else
+  echo "Serviço mysqld não iniciado!"
+exit
+fi
 
+
+# Criando Banco de Dados
+db_root # Chama a função para digitar a senha de root do banco de dados
+sleep 1
+db_zabbix # Chama a função para digitar a senha do usuário zabbix do banco de dados
+sleep 1
+echo "Verificando senha padrão do mysql"
+SENHA_dbTMP=$(grep "temporary password" /var/log/mysqld.log | sed 's/\s\+//g' | cut -d: -f4)
+sleep 1
 echo "Alterando senha de root do Banco de Dados"
 mysql -uroot -p$SENHA_dbTMP -e "set password for "root"@"localhost" = password('$SENHA_dbROOT')" --connect-expired-password 1> /dev/null
 sleep 1
@@ -66,7 +109,6 @@ clear
 
 # Importando tabelas para o banco de dados
 versao_zabbix=$(rpm -qa | grep "zabbix-server-mysql" | cut -d"-" -f4)
-sleep 1
 zcat /usr/share/doc/zabbix-server-mysql-$versao_zabbix/create.sql.gz | mysql -h 127.0.0.1 -uzabbix -p$SENHA_dbZABBIX zabbix
 
 # Configuração dos arquivos zabbix_server e zabbix_agent
