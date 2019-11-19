@@ -32,6 +32,7 @@
 # ------------------------------- VARIÁVEIS ----------------------------------------- #
 SERVER_NAME=$(hostname)
 SERVER_IP=$(hostname -I)
+WGET=$(which wget)
 # ------------------------------- FUNÇÕES ----------------------------------------- #
 function db_root() {
   echo "Digite uma senha para o usuário root do banco de dados:"
