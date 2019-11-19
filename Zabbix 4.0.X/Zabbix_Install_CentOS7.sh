@@ -70,6 +70,7 @@ sleep 1
 # Atualizando sistema
 echo "Atualizando sistema"
   yum update -y
+  clear
 echo "Instalando pacotes necessários"
   yum install wget net-tools epel-release python-pip net-snmp* traceroute nmap vim -y
   clear
@@ -81,6 +82,7 @@ else
   echo "Desabilitando Selinux..."
   sleep 2
   sed -i 's/SELINUX=enforcing/SELINUX=disabled/' /etc/selinux/config
+  setenforce 0
   echo "Selinux desabilitado!"
   sleep 1
 fi
@@ -115,20 +117,20 @@ echo "Verificando senha padrão do mysql"
 SENHA_dbTMP=$(grep "temporary password" /var/log/mysqld.log | sed 's/\s\+//g' | cut -d: -f4)
 sleep 1
 echo "Alterando senha de root do Banco de Dados"
-  mysql -uroot -p$SENHA_dbTMP -e "set password for "root"@"localhost" = password('$SENHA_dbROOT')" --connect-expired-password 1> /dev/null
+  mysql -uroot -p$SENHA_dbTMP -e "set password for "root"@"localhost" = password('$SENHA_dbROOT')" --connect-expired-password
   sleep 1
   mysql -uroot -p$SENHA_dbROOT -e "flush privileges" --connect-expired-password 1> /dev/null
   sleep 1
 echo "Criando banco de dados zabbix"
-  mysql -uroot -p$SENHA_dbROOT -e "create database zabbix character set utf8 collate utf8_bin;" --connect-expired-password 1> /dev/null
+  mysql -uroot -p$SENHA_dbROOT -e "create database zabbix character set utf8 collate utf8_bin;" --connect-expired-password
   sleep 1
 echo "Criando usuário zabbix"
-  mysql -uroot -p$SENHA_dbROOT -e "create user "zabbix"@"localhost" identified by 'SdRedeszz#2019';" --connect-expired-password 1> /dev/null
+  mysql -uroot -p$SENHA_dbROOT -e "create user "zabbix"@"localhost" identified by '$SENHA_dbZABBIX';" --connect-expired-password
   sleep 1
 echo "Garantindo permissions de administrador para o usuário zabbix"
-  mysql -uroot -p$SENHA_dbROOT -e "grant all on zabbix.* to "zabbix"@"localhost" identified by 'SdRedeszz#2019';" --connect-expired-password 1> /dev/null
+  mysql -uroot -p$SENHA_dbROOT -e "grant all on zabbix.* to "zabbix"@"localhost" identified by '$SENHA_dbZABBIX';" --connect-expired-password
   sleep 1
-  mysql -uroot -p$SENHA_dbROOT -e "alter user "zabbix"@"localhost" identified with mysql_native_password by 'SdRedeszz#2019';" --connect-expired-password 1> /dev/null
+  mysql -uroot -p$SENHA_dbROOT -e "alter user "zabbix"@"localhost" identified with mysql_native_password by '$SENHA_dbZABBIX';" --connect-expired-password
   sleep 1
 
 # Instalando Zabbix Server
