@@ -144,6 +144,7 @@ echo "Instalando Zabbix server, sender, get e agent"
   clear
 
 # Importando tabelas para o banco de dados
+echo "Importando tabelas para o banco de dados"
 versao_zabbix=$(rpm -qa | grep "zabbix-server-mysql" | cut -d"-" -f4)
   zcat /usr/share/doc/zabbix-server-mysql-$versao_zabbix/create.sql.gz | mysql -h 127.0.0.1 -uzabbix -p$SENHA_dbZABBIX zabbix
 
