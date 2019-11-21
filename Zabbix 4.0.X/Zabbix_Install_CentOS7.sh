@@ -52,7 +52,7 @@ source /etc/os-release
 function instalacao() {
 echo "################################################################################"
 echo "#                                                                              #"
-echo "#                 Instalação do zabbix 4.0.X no CentOS 7                       #"
+echo "#                 Instalação do zabbix 4.0.X Mysql 8.0.X no CentOS 7           #"
 echo "#                 Autor: Alexandre Castro                                      #"
 echo "#                 GitHub: https://github.com/alexandremjcastro/                #"
 echo "#                 E-mail: alexandremichael.jesus@gmail.com                     #"
