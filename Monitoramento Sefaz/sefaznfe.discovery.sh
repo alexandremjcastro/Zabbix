@@ -35,7 +35,7 @@ LINK=$1 # Link tem que ser adicionado na macro do host no zabbix.
 ARQUIVO_TEMPORARIO="/tmp/statusNFE.txt" # Local onde será salvo as informações da página
 # ------------------------------- EXECUÇÃO ----------------------------------------- #
 # Download do link fornecido.
-if $CURL -s -k -o $ARQUIVO_TEMPORARIO "$LINK"; then
+if $CURL -b 'session=' -s -k -o $ARQUIVO_TEMPORARIO "$LINK"; then
 echo "1" # Download realizado com sucesso
 else
 echo "0" # Falha ao realizar o download
